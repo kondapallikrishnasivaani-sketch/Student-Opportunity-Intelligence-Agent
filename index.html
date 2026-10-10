@@ -1,0 +1,339 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Opportunity Agent</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#fafafa;--surface:#fff;--surface2:#f4f4f5;--border:#e4e4e7;--text:#18181b;--muted:#71717a;--accent:#5b5bd6;--accentsoft:#ededfc;--good:#15803d;--goodbg:#dcfce7;--warn:#b45309;--warnbg:#fef3c7;--bad:#b91c1c;--badbg:#fee2e2;--new:#0e7490;--newbg:#cffafe;color-scheme:light}
+[data-theme=dark]{--bg:#0b0b0e;--surface:#121216;--surface2:#1a1a20;--border:#2a2a33;--text:#ececf1;--muted:#9a9aa8;--accent:#9494f2;--accentsoft:#24244a;--good:#4ade80;--goodbg:#10301f;--warn:#fbbf24;--warnbg:#33270d;--bad:#f87171;--badbg:#331517;--new:#22d3ee;--newbg:#0c2d36;color-scheme:dark}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text);font:15px/1.5 'Geist',Inter,system-ui,sans-serif}
+button,input,select{font:inherit;color:inherit}
+h1,h2,h3{letter-spacing:-.02em;font-weight:600;margin:0}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.app{display:grid;grid-template-columns:290px 1fr;min-height:100vh}
+/* sidebar */
+.side{background:var(--surface);border-right:1px solid var(--border);padding:16px;position:sticky;top:0;height:100vh;overflow-y:auto}
+.brand{display:flex;align-items:center;gap:10px;font-weight:700;margin-bottom:14px}
+.brand i{display:grid;place-items:center;width:28px;height:28px;border-radius:8px;background:var(--accent);color:#fff;font-style:normal}
+.nav button{display:flex;justify-content:space-between;width:100%;padding:8px 10px;border:0;border-radius:8px;background:none;cursor:pointer;text-align:left;margin-bottom:2px}
+.nav button:hover{background:var(--surface2)}
+.nav button.on{background:var(--accentsoft);color:var(--accent);font-weight:600}
+.sh{font-size:.78rem;font-weight:600;color:var(--muted);margin:18px 0 6px}
+.me{display:flex;align-items:center;gap:10px;padding:10px;border:1px solid var(--border);border-radius:10px;background:var(--bg);margin-bottom:10px}
+.me i{display:grid;place-items:center;width:34px;height:34px;border-radius:50%;background:var(--accentsoft);color:var(--accent);font-style:normal;font-weight:700}
+.me b{display:block;font-size:.9rem;line-height:1.2}.me span{font-size:.78rem;color:var(--muted)}
+.f{display:block;margin-bottom:10px;font-size:.82rem;color:var(--muted)}
+.f input,.f select,.input{display:block;width:100%;margin-top:3px;padding:8px 10px;border:1px solid var(--border);border-radius:8px;background:var(--surface);color:var(--text)}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.types{display:flex;flex-wrap:wrap;gap:6px}
+.types label{cursor:pointer}.types input{position:absolute;opacity:0}
+.types span{display:inline-block;padding:3px 10px;border:1px solid var(--border);border-radius:99px;font-size:.78rem;color:var(--muted)}
+.types input:checked+span{background:var(--accentsoft);color:var(--accent);border-color:transparent;font-weight:600}
+.types input:focus-visible+span{outline:2px solid var(--accent)}
+.hist{display:block;width:100%;text-align:left;padding:6px 8px;border:0;background:none;border-radius:6px;color:var(--text);cursor:pointer;font-size:.85rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.hist:hover{background:var(--surface2)}
+.muted{color:var(--muted);font-size:.85rem}
+.switch{display:flex;align-items:center;justify-content:space-between;font-size:.9rem;cursor:pointer}
+.switch input{width:36px;height:20px;appearance:none;background:var(--border);border-radius:99px;position:relative;cursor:pointer;margin:0}
+.switch input::after{content:"";position:absolute;top:2px;left:2px;width:16px;height:16px;border-radius:50%;background:#fff;transition:left .15s}
+.switch input:checked{background:var(--accent)}.switch input:checked::after{left:18px}
+/* main */
+main{padding:28px 32px 64px;max-width:1120px;width:100%}
+.top-m{display:none}
+.ph h1{font-size:1.65rem}.ph p{color:var(--muted);margin:2px 0 16px}
+.live{display:inline-flex;align-items:center;gap:6px;font-size:.78rem;color:var(--good);background:var(--goodbg);padding:2px 9px;border-radius:99px;margin-left:8px;vertical-align:middle;font-weight:500}
+.live i{width:6px;height:6px;border-radius:50%;background:var(--good)}
+.sform{display:flex;gap:10px}.sform .input{margin:0;flex:1;padding:10px 12px}
+.btn{display:inline-flex;align-items:center;justify-content:center;padding:7px 14px;border:1px solid var(--border);border-radius:8px;background:var(--surface);color:var(--text);cursor:pointer;font-size:.88rem;font-weight:500;text-decoration:none;transition:background .12s}
+.btn:hover{background:var(--surface2)}
+.btn.pri{background:var(--accent);border-color:var(--accent);color:#fff}.btn.pri:hover{filter:brightness(1.08)}
+.btn:disabled{opacity:.6;cursor:wait}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin:18px 0}
+.stat{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:14px 16px}
+.stat span{font-size:.8rem;color:var(--muted)}.stat b{display:block;font-size:1.65rem;font-weight:600;letter-spacing:-.02em}
+.tools{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:10px}
+.tools .input{margin:0;flex:1;min-width:200px}.tools select{width:auto;margin:0}
+.pw{position:relative}
+.pop{display:none;position:absolute;right:0;top:calc(100% + 6px);z-index:20;width:280px;background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:14px;box-shadow:0 8px 30px rgba(0,0,0,.15)}
+.pop.open{display:block}.pop .f{margin-bottom:12px}
+.ck{display:flex;gap:8px;align-items:center;font-size:.88rem;margin-bottom:8px;cursor:pointer}
+/* cards */
+.card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:18px 20px;margin-bottom:12px;transition:border-color .12s}
+.card:hover{border-color:var(--muted)}
+.top{display:flex;gap:16px;justify-content:space-between;align-items:flex-start}.main{min-width:0;flex:1}
+.badges{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:8px}
+.b{padding:2px 9px;border-radius:99px;font-size:.74rem;font-weight:500;background:var(--surface2);color:var(--muted);border:1px solid var(--border)}
+.b.likely{background:var(--goodbg);color:var(--good);border-color:transparent}.b.unclear{background:var(--warnbg);color:var(--warn);border-color:transparent}
+.b.unlikely{background:var(--badbg);color:var(--bad);border-color:transparent}.b.new{background:var(--newbg);color:var(--new);border-color:transparent;font-weight:600}
+.card h3{font-size:1.06rem;line-height:1.3}
+.org{display:flex;flex-wrap:wrap;gap:2px 12px;font-size:.84rem;color:var(--muted);margin-top:2px}
+.score{flex:0 0 76px;text-align:right}.score b{font-size:1.7rem;font-weight:600;letter-spacing:-.03em;line-height:1}
+.score span{display:block;font-size:.72rem;color:var(--muted);margin:2px 0 6px}
+.score i{display:block;height:4px;border-radius:9px;background:var(--surface2)}.score u{display:block;height:100%;border-radius:9px;background:var(--muted)}
+.score.good b{color:var(--good)}.score.good u{background:var(--good)}.score.warn b{color:var(--warn)}.score.warn u{background:var(--warn)}
+.snip{color:var(--muted);font-size:.9rem;margin:10px 0;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.meta{display:flex;flex-wrap:wrap;gap:6px 20px;font-size:.84rem;color:var(--muted);margin-bottom:8px}
+.meta span{display:inline-flex;align-items:center;gap:6px}.meta b{color:var(--text);font-weight:500}
+.meta .warn b{color:var(--warn)}.meta .bad b{color:var(--bad)}
+.chip{display:inline-block;padding:2px 8px;margin:0 4px 4px 0;border-radius:6px;background:var(--accentsoft);color:var(--accent);font-size:.78rem;font-weight:500}
+.chip.none{background:none;color:var(--muted);padding-left:0}
+.acts{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+/* dialog */
+dialog{width:min(720px,94vw);max-height:90vh;border:1px solid var(--border);border-radius:14px;background:var(--surface);color:var(--text);padding:24px;overflow-y:auto}
+dialog::backdrop{background:rgba(0,0,0,.5)}
+.dh{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
+.x{border:0;background:none;font-size:1.4rem;cursor:pointer;color:var(--muted)}
+.kv{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px;margin:12px 0}
+.kv div{background:var(--surface2);border-radius:8px;padding:9px 12px}.kv span{display:block;font-size:.74rem;color:var(--muted)}.kv b{font-size:.9rem;font-weight:500}
+.sec{font-size:.8rem;font-weight:600;color:var(--muted);margin:16px 0 6px}
+.bar{display:grid;grid-template-columns:120px 1fr 48px;gap:10px;align-items:center;font-size:.85rem;margin:6px 0}
+.bar i{display:block;height:6px;border-radius:9px;background:var(--surface2)}.bar u{display:block;height:100%;border-radius:9px;background:var(--accent)}.bar b{text-align:right;font-weight:500}
+.evi{font-size:.86rem;color:var(--muted);padding:8px 0;border-top:1px solid var(--border)}
+.evi code{background:var(--surface2);color:var(--text);padding:1px 6px;border-radius:5px;word-break:break-word}
+.note{border-left:3px solid var(--warn);background:var(--warnbg);padding:8px 12px;border-radius:0 8px 8px 0;font-size:.88rem}
+/* states */
+.state{text-align:center;padding:44px 20px;border:1px dashed var(--border);border-radius:14px;background:var(--surface);margin-bottom:12px}
+.state h3{margin:6px 0 4px;font-size:1.1rem}.state p{color:var(--muted);margin:0 auto;max-width:50ch;font-size:.92rem}
+.state.err{border-style:solid;border-color:var(--bad);background:var(--badbg)}.state.err h3{color:var(--bad)}
+.steps{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;margin:16px 0}
+.step{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:14px 16px}
+.step b{display:grid;place-items:center;width:24px;height:24px;border-radius:50%;background:var(--accentsoft);color:var(--accent);font-size:.8rem;margin-bottom:8px}
+.step h4{margin:0 0 2px;font-size:.95rem}.step p{margin:0;color:var(--muted);font-size:.86rem}
+.prog{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:16px 18px;margin:16px 0}
+.pbar{height:6px;border-radius:9px;background:var(--surface2);overflow:hidden;margin:10px 0}.pbar u{display:block;height:100%;width:0;background:var(--accent);border-radius:9px;transition:width .3s}
+.plog{font-size:.84rem;color:var(--muted);max-height:120px;overflow-y:auto}
+.spin{display:inline-block;width:14px;height:14px;border:2px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:sp .8s linear infinite;vertical-align:-2px;margin-right:8px}
+@keyframes sp{to{transform:rotate(360deg)}}
+.scrim{display:none}
+@media (max-width:900px){
+  .app{grid-template-columns:1fr}
+  .side{position:fixed;z-index:30;left:0;width:290px;transform:translateX(-100%);transition:transform .2s}
+  .side.open{transform:none}.scrim.open{display:block;position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:25}
+  .top-m{display:flex;align-items:center;gap:10px;margin-bottom:14px}
+  main{padding:16px 16px 48px}.sform{flex-direction:column}
+}
+@media (max-width:560px){.bar{grid-template-columns:90px 1fr 44px}.score{flex-basis:60px}}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+</style>
+</head>
+<body>
+<div class="app">
+<aside class="side" id="side">
+  <div class="brand"><i>🎓</i>Opportunity Agent</div>
+  <nav class="nav"><button id="nav-discover" class="on" data-page="discover">Discover</button><button id="nav-saved" data-page="saved"><span>Saved</span><span id="savedN">0</span></button></nav>
+  <div class="sh">Student profile</div>
+  <div class="me"><i id="av">A</i><div><b id="meName">Student</b><span id="meSub"></span></div></div>
+  <label class="f">Name<input id="p_name"></label>
+  <div class="row"><label class="f">Degree<select id="p_degree"></select></label><label class="f">Branch<select id="p_branch"></select></label></div>
+  <label class="f">Academic year<select id="p_year"></select></label>
+  <label class="f">Skills<input id="p_skills" placeholder="Comma separated"></label>
+  <label class="f">Interests<input id="p_interests" placeholder="Comma separated"></label>
+  <label class="f">Preferred location<input id="p_location"></label>
+  <div class="f">Opportunity types</div><div class="types" id="p_types"></div>
+  <div class="sh">Recent searches</div><div id="hist"></div>
+  <div class="sh">Appearance</div>
+  <label class="switch">Dark mode<input type="checkbox" id="dark"></label>
+</aside>
+<div class="scrim" id="scrim"></div>
+<main>
+  <div class="top-m"><button class="btn" id="menu" aria-label="Open menu">Menu</button><b>Opportunity Agent</b></div>
+  <section id="pg-discover">
+    <div class="ph"><h1>Discover<span id="live" class="live" hidden><i></i>Live web search</span></h1><p>Describe what you want. The agent searches the live web and ranks results for your profile.</p></div>
+    <form class="sform" id="sform"><input class="input" id="q" placeholder="e.g. Summer ML internships for 2nd year students, remote is fine" aria-label="Search request"><button class="btn pri" id="go">Find opportunities</button></form>
+    <div id="prog"></div><div id="body"></div>
+  </section>
+  <section id="pg-saved" hidden><div class="ph"><h1>Saved</h1><p>Opportunities you bookmarked.</p></div><div id="savedList"></div></section>
+</main>
+</div>
+<dialog id="dlg"></dialog>
+<script>
+const $=s=>document.querySelector(s);
+const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const safe=u=>/^https?:\/\//i.test(u)?u:"#";
+const store={get(k,d){try{const v=JSON.parse(localStorage.getItem(k));return v??d}catch{return d}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch{}}};
+const ico=b=>`<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${b}</svg>`;
+const I_CAL=ico('<rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/>'),I_CLK=ico('<circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/>'),I_PIN=ico('<path d="M21 10c0 7-9 13-9 13S3 17 3 10a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/>');
+const TYPES=["Internship","Hackathon","Scholarship","Competition","Workshop","Fellowship"];
+const BREAK=[["Skills","skills",35],["Academic year","academic_year",20],["Branch","branch",15],["Opportunity type","opportunity_type",15],["Location","location",10],["Freshness","freshness",5]];
+const DEF_F={text:"",type:"All",elig:"All",score:0,isNew:false,soon:false,hasDl:false,sort:"new"};
+let S={results:[],queries:[],fav:store.get("opp.fav",{}),hist:store.get("opp.hist",[]),f:{...DEF_F},live:false,error:null,page:"discover",busy:false};
+
+/* ---------- profile ---------- */
+const fill=(id,arr)=>{$(id).innerHTML=arr.map(v=>`<option>${v}</option>`).join("")};
+fill("#p_degree",["B.Tech","B.E","M.Tech","B.Sc","M.Sc","BCA","MCA"]);fill("#p_branch",["CSE","IT","ECE","EEE","Mech","Civil","AIDS","Other"]);fill("#p_year",["1st Year","2nd Year","3rd Year","4th Year"]);
+$("#p_types").innerHTML=TYPES.map(t=>`<label><input type="checkbox" value="${t}"><span>${t}</span></label>`).join("");
+const P0={name:"Alex Student",degree:"B.Tech",branch:"CSE",year:"2nd Year",skills:"C, C++, Python, SQL",interests:"AI, Data Science, Software Development",location:"India",types:["Internship","Hackathon"]};
+const prof=Object.assign({},P0,store.get("opp.profile",{}));
+const F=["name","degree","branch","year","skills","interests","location"];
+F.forEach(k=>{$("#p_"+k).value=prof[k]});
+document.querySelectorAll("#p_types input").forEach(i=>i.checked=prof.types.includes(i.value));
+function getProfile(){
+  const p={};F.forEach(k=>p[k]=$("#p_"+k).value.trim());
+  p.types=[...document.querySelectorAll("#p_types input:checked")].map(i=>i.value);
+  return p;
+}
+function saveProfile(){const p=getProfile();store.set("opp.profile",p);$("#av").textContent=(p.name[0]||"?").toUpperCase();$("#meName").textContent=p.name||"Student";$("#meSub").textContent=`${p.degree} ${p.branch}, ${p.year}`}
+$("#side").addEventListener("input",e=>{if(e.target.id.startsWith("p_"))saveProfile()});saveProfile();
+
+/* ---------- theme ---------- */
+const dark=store.get("opp.dark",matchMedia("(prefers-color-scheme: dark)").matches);
+$("#dark").checked=dark;document.documentElement.dataset.theme=dark?"dark":"light";
+$("#dark").onchange=e=>{document.documentElement.dataset.theme=e.target.checked?"dark":"light";store.set("opp.dark",e.target.checked)};
+
+/* ---------- derived values (all from real result data) ---------- */
+const day0=()=>{const d=new Date();d.setHours(0,0,0,0);return d};
+const isNew=o=>{if(!o.posted_iso)return false;const a=Math.round((day0()-new Date(o.posted_iso+"T00:00:00"))/864e5);return a>=0&&a<=7};
+const dlDate=o=>{if(!o.deadline)return null;const t=Date.parse(o.deadline);return isNaN(t)?null:new Date(t)};
+function dlInfo(o){
+  if(!o.deadline)return{label:"Not found, check the source",tone:"",days:null};
+  const label=o.deadline+(o.deadline_confident?"":" (verify)"),d=dlDate(o);if(!d)return{label,tone:"",days:null};
+  const days=Math.round((d-day0())/864e5);
+  if(days<0)return{label:label+", closed",tone:"bad",days};
+  return days<=14?{label:`${label}, ${days}d left`,tone:"warn",days}:{label,tone:"",days};
+}
+const isSoon=o=>{const i=dlInfo(o);return o.deadline_confident&&i.days!==null&&i.days>=0&&i.days<=14};
+const postedLabel=o=>o.posted_iso?new Date(o.posted_iso+"T00:00:00").toLocaleDateString("en-GB",{day:"numeric",month:"short",year:"numeric"}):(o.posted_raw||"Not listed");
+function locLabel(o){
+  const t=`${o.title} ${o.snippet}`.toLowerCase(),pref=$("#p_location").value.trim().toLowerCase();
+  const tags=["remote","online","hybrid","on-site"].filter(w=>t.includes(w)).map(w=>w[0].toUpperCase()+w.slice(1));
+  if(pref&&t.includes(pref))tags.push(pref[0].toUpperCase()+pref.slice(1));
+  return tags.join(", ")||"Not stated";
+}
+
+/* ---------- renderers ---------- */
+const badges=o=>`<span class="b">${esc(o.opportunity_type)}</span><span class="b ${esc(o.eligibility)}">${esc(o.eligibility_label)}</span>${isNew(o)?'<span class="b new">New</span>':""}`;
+const chips=o=>(o.matched_skills||[]).map(s=>`<span class="chip">${esc(s)}</span>`).join("")||'<span class="chip none">No listed skills matched</span>';
+function card(o){
+  const tone=o.match_score>=70?"good":o.match_score>=45?"warn":"",d=dlInfo(o),saved=o.url in S.fav,u=esc(o.url);
+  return `<article class="card"><div class="top"><div class="main"><div class="badges">${badges(o)}</div><h3>${esc(o.title)}</h3><div class="org"><span>${esc(o.organization||o.source_domain)}</span><span>${esc(o.source_domain)}</span></div></div>
+<div class="score ${tone}"><b>${o.match_score}</b><span>match score</span><i><u style="width:${o.match_score}%"></u></i></div></div>
+<p class="snip">${esc(o.snippet)||"No description available."}</p>
+<div class="meta"><span>${I_CAL}Posted <b>${esc(postedLabel(o))}</b></span><span class="${d.tone}">${I_CLK}Deadline <b>${esc(d.label)}</b></span><span>${I_PIN}<b>${esc(locLabel(o))}</b></span></div>
+<div>${chips(o)}</div>
+<div class="acts"><button class="btn" data-act="details" data-url="${u}">Details</button><button class="btn" data-act="save" data-url="${u}">${saved?"Saved ★":"Save ☆"}</button><a class="btn" href="${esc(safe(o.url))}" target="_blank" rel="noopener noreferrer">Open page</a></div></article>`;
+}
+function detail(o){
+  const d=dlInfo(o),saved=o.url in S.fav,u=esc(o.url),bd=o.score_breakdown||{};
+  const bars=BREAK.map(([l,k,m])=>`<div class="bar"><span>${l}</span><i><u style="width:${Math.round((bd[k]||0)/m*100)}%"></u></i><b>${bd[k]||0}/${m}</b></div>`).join("");
+  const evi=(o.evidence||[]).map(e=>`<div class="evi">Found with <code>${esc(e.query)}</code> on ${esc(e.source_domain)}<br>${esc(e.snippet)||"No snippet."}</div>`).join("");
+  return `<div class="dh"><div class="badges" style="margin:0">${badges(o)}</div><button class="x" data-act="close" aria-label="Close">×</button></div>
+<h2 style="font-size:1.25rem">${esc(o.title)}</h2><div class="org"><span>${esc(o.organization||o.source_domain)}</span><span>${esc(o.source_domain)}</span></div>
+<div class="kv"><div><span>Match score</span><b>${o.match_score}/100</b></div><div><span>Posted</span><b>${esc(postedLabel(o))}</b></div><div><span>Deadline</span><b>${esc(d.label)}</b></div><div><span>Location</span><b>${esc(locLabel(o))}</b></div></div>
+<div class="sec">Eligibility</div><div><b>${esc(o.eligibility_label)}.</b> ${esc(o.eligibility_reason||"")}</div>
+<div class="sec">Why it matches you</div><div>${esc(o.match_explanation)}</div>
+<div class="sec">Matched skills</div><div>${chips(o)}</div>
+${o.potential_concern?`<div class="sec">Notes</div><div class="note">${esc(o.potential_concern)}</div>`:""}
+<div class="sec">Search result text</div><div>${esc(o.snippet)||"No description available."}</div>
+<div class="sec">How the score was calculated</div>${bars}<div class="sec">How it was found</div>${evi}
+<div class="acts"><a class="btn pri" href="${esc(safe(o.url))}" target="_blank" rel="noopener noreferrer">Open original page</a><button class="btn" data-act="save" data-url="${u}">${saved?"Remove from saved":"Save opportunity"}</button></div>`;
+}
+const stateBox=(i,t,p,err)=>`<div class="state ${err?"err":""}"><div style="font-size:1.8rem">${i}</div><h3>${esc(t)}</h3><p>${esc(p)}</p></div>`;
+const ERR={missing_key:["API key missing","Set the SERPAPI_KEY environment variable (or add it to .streamlit/secrets.toml), then restart server.py."],invalid_key:["API key rejected","SerpApi did not accept your key. Check the value of SERPAPI_KEY."],quota:["Search limit reached","Your SerpApi quota is used up. Check your SerpApi account, then try again."],network:["Connection problem","Could not reach SerpApi. Check your internet connection and search again."],empty:["No usable results",null]};
+
+function applyFilters(){
+  const f=S.f;let r=S.results.slice();
+  if(f.text.trim()){const q=f.text.trim().toLowerCase();r=r.filter(o=>`${o.title} ${o.snippet} ${o.organization} ${o.source_domain}`.toLowerCase().includes(q))}
+  if(f.type!=="All")r=r.filter(o=>o.opportunity_type===f.type);
+  if(f.elig!=="All")r=r.filter(o=>o.eligibility===f.elig);
+  r=r.filter(o=>o.match_score>=f.score);
+  if(f.isNew)r=r.filter(isNew);if(f.soon)r=r.filter(isSoon);if(f.hasDl)r=r.filter(o=>o.deadline);
+  if(f.sort==="score")r.sort((a,b)=>b.match_score-a.match_score);
+  else if(f.sort==="deadline")r.sort((a,b)=>{const x=dlDate(a),y=dlDate(b);return (x?0:1)-(y?0:1)||(x&&y?x-y:0)});
+  else r.sort((a,b)=>(b.posted_iso||"").localeCompare(a.posted_iso||"")||b.match_score-a.match_score);
+  return r;
+}
+function renderBody(){
+  const el=$("#body");$("#live").hidden=!S.live;
+  if(S.error){const [t,h]=ERR[S.error.kind]||["Search failed",null];el.innerHTML=stateBox("⚠️",t,h||S.error.message,true);return}
+  if(!S.results.length){
+    el.innerHTML=(S.configured===false?stateBox("🔑","Connect SerpApi to start","No SERPAPI_KEY was found on the server. Set it as an environment variable and restart server.py."):"")+
+    `<div class="steps"><div class="step"><b>1</b><h4>Set your profile</h4><p>Add branch, year, skills and opportunity types in the sidebar.</p></div><div class="step"><b>2</b><h4>Ask in plain words</h4><p>The agent turns your request into several targeted web searches.</p></div><div class="step"><b>3</b><h4>Review the matches</h4><p>Each result shows eligibility, deadline and a score you can break down.</p></div></div><button class="btn" data-act="sample">Try a sample search</button>`;
+    return;
+  }
+  const R=S.results,avg=Math.round(R.reduce((a,o)=>a+o.match_score,0)/R.length);
+  const stats=[["Total found",R.length],["Likely eligible",R.filter(o=>o.eligibility==="likely").length],["New this week",R.filter(isNew).length],["Average match",avg],["Deadlines soon",R.filter(isSoon).length]];
+  const f=S.f,active=["type","elig","score","isNew","soon","hasDl"].filter(k=>f[k]!==DEF_F[k]).length;
+  const list=applyFilters(),dated=R.some(o=>o.posted_iso);
+  const opt=(v,l,cur)=>`<option value="${v}" ${cur===v?"selected":""}>${l}</option>`;
+  el.innerHTML=`<div class="stats">${stats.map(([l,v])=>`<div class="stat"><span>${l}</span><b>${v}</b></div>`).join("")}</div>
+<div class="tools"><input class="input" id="f_text" placeholder="Filter results by keyword" value="${esc(f.text)}" aria-label="Filter results">
+<div class="pw"><button class="btn" id="fbtn" type="button">Filters${active?` (${active})`:""}</button><div class="pop" id="pop">
+<label class="f">Opportunity type<select id="f_type">${["All",...TYPES,"Unknown"].map(t=>opt(t,t,f.type)).join("")}</select></label>
+<label class="f">Eligibility<select id="f_elig">${opt("All","All",f.elig)}${opt("likely","Likely Eligible",f.elig)}${opt("unclear","Eligibility Unclear",f.elig)}${opt("unlikely","Likely Not Eligible",f.elig)}</select></label>
+<label class="f">Minimum match score: <b id="sv">${f.score}</b><input type="range" id="f_score" min="0" max="100" step="5" value="${f.score}"></label>
+<label class="ck"><input type="checkbox" id="f_isNew" ${f.isNew?"checked":""}>New this week only</label>
+<label class="ck"><input type="checkbox" id="f_soon" ${f.soon?"checked":""}>Deadline within 14 days</label>
+<label class="ck"><input type="checkbox" id="f_hasDl" ${f.hasDl?"checked":""}>Has a detected deadline</label>
+<button class="btn" type="button" data-act="reset" style="width:100%">Reset filters</button></div></div>
+<select class="input" id="f_sort" style="flex:0 0 auto;width:auto" aria-label="Sort by">${opt("new","Newest + Match",f.sort)}${opt("score","Match Score",f.sort)}${opt("deadline","Deadline",f.sort)}</select></div>
+<div class="muted" style="margin-bottom:12px">Showing ${list.length} of ${R.length}${dated?"":". No posting dates were returned for these results, so Newest + Match falls back to match score."}</div>
+<div id="list">${list.length?list.map(card).join(""):stateBox("🔍","No results match these filters","Remove a filter or lower the minimum score to see more of the results.")+'<button class="btn" data-act="reset">Reset filters</button>'}</div>
+${S.queries.length?`<details style="margin-top:16px"><summary class="muted" style="cursor:pointer">What the agent searched</summary><ol class="muted">${S.queries.map(q=>`<li><code>${esc(q)}</code></li>`).join("")}</ol></details>`:""}`;
+}
+function renderSaved(){
+  const v=Object.values(S.fav);$("#savedN").textContent=v.length;
+  $("#savedList").innerHTML=v.length?v.map(card).join(""):stateBox("☆","Nothing saved yet","Open Discover, run a search and choose Save on any result to keep it here.");
+}
+function renderHist(){$("#hist").innerHTML=S.hist.length?S.hist.slice(0,5).map((h,i)=>`<button class="hist" data-act="hist" data-i="${i}" title="${esc(h)}">${esc(h)}</button>`).join(""):'<div class="muted">Your searches will show up here.</div>'}
+function refresh(){renderBody();renderSaved();renderHist()}
+
+/* ---------- actions ---------- */
+const find=u=>S.results.find(o=>o.url===u)||S.fav[u];
+function toggleSave(u){const o=find(u);if(!o)return;if(u in S.fav)delete S.fav[u];else S.fav[u]=o;store.set("opp.fav",S.fav);refresh();if($("#dlg").open)$("#dlg").innerHTML=detail(o)}
+function setPage(p){S.page=p;$("#pg-discover").hidden=p!=="discover";$("#pg-saved").hidden=p!=="saved";["discover","saved"].forEach(n=>$("#nav-"+n).classList.toggle("on",n===p));closeMenu()}
+const closeMenu=()=>{$("#side").classList.remove("open");$("#scrim").classList.remove("open")};
+$("#menu").onclick=()=>{$("#side").classList.add("open");$("#scrim").classList.add("open")};$("#scrim").onclick=closeMenu;
+document.querySelectorAll(".nav button").forEach(b=>b.onclick=()=>setPage(b.dataset.page));
+document.addEventListener("click",e=>{
+  const a=e.target.closest("[data-act]");
+  if(!a){if(!e.target.closest(".pw"))$("#pop")?.classList.remove("open");if(e.target===$("#dlg"))$("#dlg").close();return}
+  const u=a.dataset.url,act=a.dataset.act;
+  if(act==="details"){$("#dlg").innerHTML=detail(find(u));$("#dlg").showModal()}
+  else if(act==="save")toggleSave(u);
+  else if(act==="close")$("#dlg").close();
+  else if(act==="reset"){S.f={...DEF_F};renderBody()}
+  else if(act==="sample"){$("#q").value="Find internships and hackathons suitable for my skills and academic year."}
+  else if(act==="hist"){setPage("discover");$("#q").value=S.hist[+a.dataset.i];$("#q").focus()}
+});
+document.addEventListener("click",e=>{if(e.target.id==="fbtn")$("#pop").classList.toggle("open")});
+document.addEventListener("input",e=>{
+  const id=e.target.id;if(!id||!id.startsWith("f_"))return;
+  const k=id.slice(2),t=e.target;S.f[k]=t.type==="checkbox"?t.checked:t.type==="range"?+t.value:t.value;
+  if(k==="score"){$("#sv").textContent=t.value}
+  if(k==="text"){const pos=t.selectionStart;renderBody();const n=$("#f_text");n.focus();n.setSelectionRange(pos,pos)}
+  else{const open=$("#pop")?.classList.contains("open");renderBody();if(open)$("#pop").classList.add("open")}
+});
+document.addEventListener("change",e=>{if(e.target.id==="f_score"){const open=$("#pop").classList.contains("open");renderBody();if(open)$("#pop").classList.add("open")}});
+
+/* ---------- search (streams real progress from the server) ---------- */
+$("#sform").addEventListener("submit",async e=>{
+  e.preventDefault();if(S.busy)return;
+  const request=$("#q").value.trim(),prog=$("#prog");let n=0;
+  S.busy=true;S.error=null;$("#go").disabled=true;$("#go").textContent="Searching…";
+  prog.innerHTML='<div class="prog"><div id="pmsg"><span class="spin"></span>Starting search</div><div class="pbar"><u id="pfill"></u></div><div class="plog" id="plog"></div></div>';
+  const step=m=>{n++;$("#pmsg").innerHTML=`<span class="spin"></span>${esc(m)}`;$("#pfill").style.width=Math.min(n/19,.97)*100+"%";$("#plog").insertAdjacentHTML("beforeend",`<div>${esc(m)}</div>`);$("#plog").scrollTop=1e9};
+  try{
+    const res=await fetch("/api/search",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({request,profile:{...getProfile(),opportunity_types:getProfile().types}})});
+    if(!res.ok||!res.body)throw new Error("bad response");
+    const rd=res.body.getReader(),dec=new TextDecoder();let buf="",done=false;
+    const handle=line=>{if(!line.trim())return;const ev=JSON.parse(line);
+      if(ev.type==="progress")step(ev.message);
+      else if(ev.type==="done"){done=true;S.results=ev.opportunities;S.queries=ev.queries;S.live=true;S.f={...DEF_F};
+        if(request)S.hist=[request,...S.hist.filter(h=>h!==request)].slice(0,10);store.set("opp.hist",S.hist)}
+      else if(ev.type==="error"){done=true;S.results=[];S.queries=[];S.live=false;S.error=ev}};
+    for(;;){const{value,done:d}=await rd.read();if(d)break;buf+=dec.decode(value,{stream:true});const parts=buf.split("\n");buf=parts.pop();parts.forEach(handle)}
+    handle(buf);
+    if(!done)throw new Error("stream ended early");
+  }catch(err){S.results=[];S.live=false;S.error={kind:"network",message:"Could not reach the local server. Make sure server.py is running."}}
+  S.busy=false;$("#go").disabled=false;$("#go").textContent="Find opportunities";prog.innerHTML="";refresh();
+});
+
+fetch("/api/status").then(r=>r.json()).then(j=>{S.configured=j.configured;refresh()}).catch(()=>{S.configured=undefined});
+refresh();
+</script>
+</body>
+</html>
