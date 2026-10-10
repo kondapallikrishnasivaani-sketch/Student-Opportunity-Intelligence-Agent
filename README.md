@@ -1,4 +1,3 @@
-# Student-Opportunity-Intelligence-Agent
 # Student Opportunity Intelligence Agent
 
 A web dashboard that searches the live web for internships, hackathons, scholarships, competitions,
